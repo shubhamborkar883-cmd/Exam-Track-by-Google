@@ -1,0 +1,39 @@
+name: Government Exam Alerts Bot
+
+# Controls when the action runs
+on:
+  schedule:
+    # Runs automatically every day at 8:00 AM UTC (1:30 PM IST)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    # Allows you to manually trigger the bot anytime from the GitHub UI
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Downloads a copy of your code onto the GitHub runner server
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    # 2. Installs Python on the server
+    - name: Set up Python
+      uses: actions/configure-pages@v5 # Standard stable setup
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    # 3. Installs dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # 4. Executes your script while passing the hidden repository secrets
+    - name: Execute Python script
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python exam_bot.py
+      
